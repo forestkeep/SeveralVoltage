@@ -137,7 +137,7 @@ static void MX_USART1_UART_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void channels_on_off(uint8_t a[]);
-void ledfrontpanel_on_off(uint8_t a[]);
+void LedFrontPanelUpdate(uint8_t a[]);
 void fill_array_for_show_integer(int16_t number, int8_t* adress);
 void fill_array_for_show_number_of_channel(int8_t chanel, int8_t* adress);
 void fill_array_for_show_double(double number, int8_t* adress);
@@ -260,7 +260,7 @@ int main(void)
 			for(i = 0; i<14;i++)Register595[i]=0; // выключаем все каналы и реле
 			Register595[14] = 1;//включаем вентилятор 
 			for(i = 0;i<8;i++) LedState[i] = 0;//выключаем светодиоды передней панели
-			ledfrontpanel_on_off(LedState);
+			LedFrontPanelUpdate(LedState);
 			channels_on_off(Register595);
 			Short_sound();
 			TimeDisp[0]= 10;TimeDisp[1]= 19;TimeDisp[2]= 19;TimeDisp[3]= 43;// Вывести надпись ALL на дисплей
@@ -806,11 +806,11 @@ uint8_t Calibration(void){//функция калибровки, возвращ�
 								count=0;
 								if(LedState[j]){
 									LedState[j]=0;
-									ledfrontpanel_on_off(LedState);
+									LedFrontPanelUpdate(LedState);
 								}
 								else{
 									LedState[j]=1;
-									ledfrontpanel_on_off(LedState);
+									LedFrontPanelUpdate(LedState);
 								}
 							}
 						
@@ -845,7 +845,7 @@ uint8_t Calibration(void){//функция калибровки, возвращ�
 		ButtonState[j]=0;
 	}
 	channels_on_off(Register595);//выключаем все каналы и реле после калибровки
-	ledfrontpanel_on_off(LedState);//выключаем все светодиоды на передней панели после выхода из калибровки
+	LedFrontPanelUpdate(LedState);//выключаем все светодиоды на передней панели после выхода из калибровки
 	return Calibration_Status;//возвращает код статуса калибровки
 //=========================================END Calibration=================================================================
 }
@@ -864,7 +864,7 @@ void channels_on_off(uint8_t a[])//отправка на сдвиговый ре
 	LL_GPIO_SetOutputPin(latchPin595_GPIO_Port, latchPin595_Pin);
 }
 //----------------------------------------------------------------------------------------------------------------------------
-void ledfrontpanel_on_off(uint8_t a[])//обновление состояний светодиодов на передней панели
+void LedFrontPanelUpdate(uint8_t a[])//обновление состояний светодиодов на передней панели
 {
   //led№                   not    3     2     1     7     6     5    4
   static int8_t b[8] =   {  7  ,  2  ,  1  ,  0  ,  6  ,  5  ,  4  , 3 };//массив верного порядка считывания и загрузки в регистр 164.
@@ -986,7 +986,7 @@ void check_uart(void){
 		if(flg){
 			flg = 0;
 			channels_on_off(Register595);
-			ledfrontpanel_on_off(LedState);
+			LedFrontPanelUpdate(LedState);
 			clear_rx_buf();
 			sprintf(logs1,"ok");
 			usart_send_string(logs1);
@@ -1062,7 +1062,7 @@ void Check_Button(void){//проверяет флаг, если поднят, т
 								Register595[i+7]=1;
 								LedState[i]=1;}}}}
 				channels_on_off(Register595);
-				ledfrontpanel_on_off(LedState);
+				LedFrontPanelUpdate(LedState);
 			}
 }
 //==================================================================================================================
@@ -1207,13 +1207,13 @@ void Are_all_lights_on_cheking(void){
 		local_count++;
 		for(i = 0;i<8;i++){
 			LedState[i] = 1;
-			ledfrontpanel_on_off(LedState);
+			LedFrontPanelUpdate(LedState);
 			LL_mDelay(50);
 			LedState[i] = 0;
 		}
 		for(i = 7;i>0;i--){
 			LedState[i] = 1;
-			ledfrontpanel_on_off(LedState);
+			LedFrontPanelUpdate(LedState);
 			LL_mDelay(50);
 			LedState[i] = 0;
 		}
